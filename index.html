@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Interativo Básico</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        recomecarcontador {
+            background-color: brown;
+            transition: background 0.3s;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        recomecarcontador:hover {
+            background-color: #b6490c;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .contador {
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0;
+        }
+        .escuro {
+            background-color: #1e1e2e;
+            color: white;
+        }
+
+        .escuro .card {
+            background-color: #2b2b3d;
+            color: white;
+        }
+
+        .escuro .contador {
+            color: #4da6ff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2 id="titulo">Contador Interativo</h2>
+        <div class="contador" id="numero">0</div>
+
+        <button onclick="aumentarContador()">Clique Aqui!</button>
+        <br><br>
+        <button onclick="alternarTema()" style="background-color: #008CBA;">Mudar Tema</button>
+        <button onclick="recomecarcontador()" style="background-color: brown;">Recomeçar</button>
+    </div>
+    <script>
+        let valor = 0;
+        function aumentarContador() {
+            valor++;
+            document.getElementById('numero').innerText = valor;
+        }
+        function alternarTema() {
+            document.body.classList.toggle('escuro');
+        }
+
+        function recomecarcontador() {
+            valor = 0;
+            document.getElementById('numero').innerText = valor;
+        }
+    </script>
+
+</body>
+
+</html>
