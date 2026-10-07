@@ -6,51 +6,187 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site Interativo Básico</title>
     <style>
+        :root {
+            --bg: #f4f4f9;
+            --panel: #ffffff;
+            --text: #1f2430;
+            --accent: #4CAF50;
+            --accent-dark: #45a049;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            background-color: var(--bg);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 24px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .card {
-            background: white;
+            background: var(--panel);
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             max-width: 350px;
             width: 100%;
+            color: var(--text);
         }
 
         button {
-            background-color: #4CAF50;
+            background-color: var(--accent);
             color: white;
             border: none;
             padding: 12px 20px;
+            font-family: inherit;
             font-size: 16px;
             border-radius: 6px;
             cursor: pointer;
             transition: background 0.3s;
         }
 
-        recomecarcontador {
-            background-color: brown;
-            transition: background 0.3s;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        recomecarcontador:hover {
-            background-color: #b6490c;
-            transition: background 0.3s;
-        }
-
         button:hover {
-            background-color: #45a049;
+            background-color: var(--accent-dark);
+        }
+
+        .roleta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .roulette-area {
+            position: relative;
+            width: min(76vw, 330px);
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .roulette-pointer {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-top: 32px solid #ff4d4d;
+            z-index: 3;
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+        }
+
+        .roulette-wheel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 10px solid #ffffff;
+            overflow: hidden;
+            box-shadow: 0 18px 30px rgba(0, 0, 0, 0.18);
+            transition: transform 5s cubic-bezier(0.12, 0.82, 0.2, 1);
+        }
+
+        .roulette-wheel::before {
+            content: "";
+            position: absolute;
+            inset: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .roulette-label {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform-origin: center center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .roulette-center {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 4px solid #dfe9ff;
+            background: #ffffff;
+            color: #333;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 700;
+            z-index: 2;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .roulette-center:hover {
+            background: #f4f4f9;
+            color: #1f2430;
+        }
+
+        .roulette-center:disabled {
+            cursor: not-allowed;
+            opacity: 0.75;
+        }
+
+        .resultado-roleta {
+            min-height: 24px;
+            font-weight: 700;
+            color: #3f297e;
+            text-align: center;
+        }
+
+        .roleta-status {
+            min-height: 20px;
+            font-size: 0.9rem;
+            color: #8b1f2d;
+            text-align: center;
+        }
+
+        .reset-points-button {
+            background-color: #666;
+        }
+
+        .floating-score {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: rgba(34, 34, 34, 0.92);
+            color: #fff;
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+            z-index: 20;
+            min-width: 150px;
+        }
+
+        .score-line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            font-size: 0.95rem;
+        }
+
+        .score-line strong {
+            font-size: 1.2rem;
         }
 
         .contador {
@@ -59,6 +195,7 @@
             color: #333;
             margin: 20px 0;
         }
+
         .escuro {
             background-color: #1e1e2e;
             color: white;
@@ -72,25 +209,79 @@
         .escuro .contador {
             color: #4da6ff;
         }
+
+        .escuro .resultado-roleta {
+            color: #c7b6ff;
+        }
+
+        .escuro .roleta-status {
+            color: #ff9ca7;
+        }
+
+        .escuro .roulette-center {
+            background-color: #2b2b3d;
+            border-color: #59607a;
+            color: #f4f4f9;
+        }
+
+        .escuro .roulette-center:hover {
+            background-color: #393950;
+            color: #ffffff;
+        }
+
+        .escuro .reset-points-button {
+            background-color: #55556b;
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 16px;
+            }
+
+            .roulette-area {
+                width: min(85vw, 300px);
+            }
+        }
     </style>
 </head>
 
 <body>
+    <div class="floating-score" aria-live="polite">
+        <div class="score-line">
+            <span>Pontos</span>
+            <strong id="pontosTotal">100</strong>
+        </div>
+    </div>
+
+    <div class="roleta">
+        <div class="roulette-area">
+            <div class="roulette-pointer"></div>
+            <div id="rouletteWheel" class="roulette-wheel"></div>
+            <button id="spinButton" class="roulette-center" type="button">Girar</button>
+        </div>
+        <div id="resultadoRoleta" class="resultado-roleta">Resultado: --</div>
+        <div id="roletaStatus" class="roleta-status" role="status" aria-live="polite"></div>
+        <button id="resetPointsButton" class="reset-points-button" type="button">Reiniciar pontos</button>
+    </div>
+
     <div class="card">
         <h2 id="titulo">Contador Interativo</h2>
         <div class="contador" id="numero">0</div>
 
-        <button onclick="aumentarContador()">Clique Aqui!</button>
+        <button onclick="aumentarContador()" type="button">Clique Aqui!</button>
         <br><br>
-        <button onclick="alternarTema()" style="background-color: #008CBA;">Mudar Tema</button>
-        <button onclick="recomecarcontador()" style="background-color: brown;">Recomeçar</button>
+        <button onclick="alternarTema()" type="button" style="background-color: #008CBA;">Mudar Tema</button>
+        <button onclick="recomecarcontador()" type="button" style="background-color: brown;">Recomeçar</button>
     </div>
+
     <script>
         let valor = 0;
+
         function aumentarContador() {
             valor++;
             document.getElementById('numero').innerText = valor;
         }
+
         function alternarTema() {
             document.body.classList.toggle('escuro');
         }
@@ -99,8 +290,148 @@
             valor = 0;
             document.getElementById('numero').innerText = valor;
         }
-    </script>
 
+        // A roleta mantém o saldo salvo no navegador, mesmo após atualizar a página.
+        const STORAGE_KEYS = {
+            pontos: 'roleta.pontos',
+            ultimoResultado: 'roleta.ultimoResultado'
+        };
+
+        // O custo é cobrado no início do giro; o prêmio ou a penalidade vem depois.
+        const CUSTO_POR_GIRO = 30;
+        const PONTOS_INICIAIS = 100;
+        const pontosTotal = document.getElementById('pontosTotal');
+        const spinButton = document.getElementById('spinButton');
+        const resetPointsButton = document.getElementById('resetPointsButton');
+        const roletaStatus = document.getElementById('roletaStatus');
+
+        function lerPontosSalvos() {
+            const pontosSalvos = localStorage.getItem(STORAGE_KEYS.pontos);
+            if (pontosSalvos === null) return PONTOS_INICIAIS;
+
+            // Ignora valores inválidos ou negativos gravados no armazenamento.
+            const pontos = Number(pontosSalvos);
+            return Number.isInteger(pontos) && pontos >= 0 ? pontos : PONTOS_INICIAIS;
+        }
+
+        let pontos = lerPontosSalvos();
+
+        function atualizarPontos() {
+            pontosTotal.textContent = pontos;
+            // Impede novos giros enquanto a animação roda ou o saldo não cobre a aposta.
+            spinButton.disabled = pontos < CUSTO_POR_GIRO || isSpinning;
+            resetPointsButton.disabled = isSpinning;
+            if (!isSpinning && pontos < CUSTO_POR_GIRO) {
+                roletaStatus.textContent = 'São necessários 30 pontos para girar.';
+            } else if (isSpinning) {
+                roletaStatus.textContent = '';
+            }
+        }
+
+        // Cada fatia define o texto, a cor e a alteração de pontos ao terminar o giro.
+        // A opção "PERDE TUDO" zera o saldo em vez de aplicar uma quantidade fixa.
+        const rouletteData = [
+            { label: '+10', points: 10, color: '#209b6c' },
+            { label: '+20', points: 20, color: '#168b55' },
+            { label: '+50', points: 50, color: '#087f6e' },
+            { label: '+100', points: 100, color: '#1665a8' },
+            { label: '-10', points: -10, color: '#e6471d' },
+            { label: '-20', points: -20, color: '#d22c3c' },
+            { label: '-50', points: -50, color: '#b62039' },
+            { label: '-100', points: -100, color: '#921d38' },
+            { label: 'PERDE TUDO', loseAll: true, color: '#29202f' }
+        ];
+
+        const rouletteWheel = document.getElementById('rouletteWheel');
+        const resultadoRoleta = document.getElementById('resultadoRoleta');
+        let currentRotation = 0;
+        let isSpinning = false;
+
+        function renderRoulette() {
+            // Divide o círculo igualmente e usa a mesma ordem para cores e rótulos.
+            const slice = 360 / rouletteData.length;
+            const gradient = rouletteData.map((item, index) => {
+                const start = index * slice;
+                const end = (index + 1) * slice;
+                return `${item.color} ${start}deg ${end}deg`;
+            }).join(', ');
+
+            rouletteWheel.style.background = `conic-gradient(${gradient})`;
+            rouletteWheel.innerHTML = '';
+
+            rouletteData.forEach((item, index) => {
+                const label = document.createElement('div');
+                label.className = 'roulette-label';
+                const angle = index * slice + slice / 2;
+                label.textContent = item.label;
+                label.style.color = '#fff';
+                // Posiciona o rótulo no meio da fatia e mantém o texto legível.
+                label.style.transform = `translate(-50%, -50%) rotate(${angle}deg) translateY(-110px) rotate(${-angle}deg)`;
+                label.style.fontSize = item.label.length > 7 ? '0.55rem' : '0.8rem';
+                rouletteWheel.appendChild(label);
+            });
+        }
+
+        function spinRoulette() {
+            if (isSpinning) return;
+
+            // A validação também existe aqui para impedir giros via chamada direta da função.
+            if (pontos < CUSTO_POR_GIRO) {
+                roletaStatus.textContent = 'Pontos insuficientes: são necessários 30 para girar.';
+                return;
+            }
+
+            isSpinning = true;
+            roletaStatus.textContent = '';
+            pontos -= CUSTO_POR_GIRO;
+            localStorage.setItem(STORAGE_KEYS.pontos, String(pontos));
+            atualizarPontos();
+
+            const slice = 360 / rouletteData.length;
+            // Sorteia uma fatia e calcula a rotação final para centralizá-la sob o ponteiro.
+            const randomIndex = Math.floor(Math.random() * rouletteData.length);
+            const selectedCenter = randomIndex * slice + slice / 2;
+            const fullTurns = 7;
+            const normalizedRotation = ((currentRotation % 360) + 360) % 360;
+            const rotationToTarget = (360 - selectedCenter - normalizedRotation + 360) % 360;
+            const rotation = currentRotation + (fullTurns * 360) + rotationToTarget;
+
+            currentRotation = rotation;
+            rouletteWheel.style.transform = `rotate(${rotation}deg)`;
+
+            const result = rouletteData[randomIndex].label;
+            resultadoRoleta.textContent = 'Girando...';
+
+            setTimeout(() => {
+                isSpinning = false;
+                const outcome = rouletteData[randomIndex];
+                // Aplica a consequência somente depois da animação; o saldo nunca fica negativo.
+                if (outcome.loseAll) {
+                    pontos = 0;
+                } else {
+                    pontos = Math.max(0, pontos + outcome.points);
+                }
+
+                resultadoRoleta.textContent = outcome.loseAll
+                    ? `Resultado: ${result} — saldo zerado`
+                    : `Resultado: ${result} pontos`;
+                localStorage.setItem(STORAGE_KEYS.pontos, String(pontos));
+                localStorage.setItem(STORAGE_KEYS.ultimoResultado, result);
+                atualizarPontos();
+            }, 5000);
+        }
+
+        spinButton.addEventListener('click', spinRoulette);
+        resetPointsButton.addEventListener('click', () => {
+            // Reinicia o saldo inicial e grava a alteração para as próximas visitas.
+            pontos = PONTOS_INICIAIS;
+            localStorage.setItem(STORAGE_KEYS.pontos, String(pontos));
+            roletaStatus.textContent = 'Pontos reiniciados para 100.';
+            atualizarPontos();
+        });
+        atualizarPontos();
+        renderRoulette();
+    </script>
 </body>
 
 </html>
